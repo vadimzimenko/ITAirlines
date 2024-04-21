@@ -1,0 +1,79 @@
+services:
+  postgres:
+    container_name: django_postgres_DB
+    image: postgres:14.8-alpine3.18
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ./DB:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - it_airlines
+
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4:7.2
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "django.admin@djnago.com"
+      PGADMIN_DEFAULT_PASSWORD: "postgres4django"
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    restart: unless-stopped
+    networks:
+      - it_airlines
+    depends_on:
+      - postgres
+
+  django:
+    build: ./ITAirlines
+    environment:
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DJANGO_KEY=${DJANGO_KEY}
+    command: gunicorn ITAirlines.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - ./ITAirlines/:/usr/src/django_app/
+    networks:
+      - it_airlines
+    restart: unless-stopped
+    expose:
+      - 8000
+    depends_on:
+      - postgres
+
+  nginx:
+    build: ./nginx
+    restart: unless-stopped
+    ports:
+    - "80:80"
+    networks:
+      - it_airlines
+    depends_on:
+      - django
+
+
+
+volumes:
+  DB:
+  pgadmin-data:
+
+networks:
+  it_airlines:
+    driver: bridge

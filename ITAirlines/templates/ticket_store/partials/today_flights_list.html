@@ -1,0 +1,10 @@
+{% if today_flights %}
+    {% for flight in today_flights %}
+    <tr {% if flight.departure_date < time_now %}class="table-secondary"{% endif %}>
+        <th scope="row"><i class="{{ flight.departure_airport.country.flag_css }}"></i> {{ flight.get_flight_path }} <i class="{{ flight.arrival_airport.country.flag_css }}"></i></th>
+        <td>{{ flight.get_departure_time }}</td>
+    </tr>
+    {% endfor %}
+{% else %}
+    <tr class="text-center">Нажаль, на сьогодні немає запланованих рейсів.</tr>
+{% endif %}

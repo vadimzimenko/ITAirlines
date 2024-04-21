@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}
+    <title>{{ title }}</title>
+{% endblock title %}
+
+{% block main_content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-4">
+                <table class="table border caption-top">
+                    <h5 class="text-center">
+                        Сьогоднішні рейси 
+                        <button class="btn btn-primary"
+                                hx-get="{% url "refresh_flights_list" %}"
+                                hx-trigger="click"
+                                hx-target="#todays_flights">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </button>
+                    </h5>
+                    <tbody id="todays_flights">
+                        {% include "ticket_store/partials/today_flights_list.html" %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col">
+                <h1 class="display-1 text-center">Welcome to ITAirlines!</h1>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius unde nam neque, asperiores impedit aperiam voluptas magnam vel nesciunt iste nihil doloremque dolore eveniet voluptatibus, necessitatibus, laudantium praesentium itaque amet.</p>
+                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Expedita distinctio ullam rerum ad nihil cupiditate voluptas neque, animi similique beatae in dolorum reiciendis consequatur corrupti consequuntur quidem dignissimos culpa ea.</p>
+                <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Corrupti deleniti rem aspernatur accusantium voluptates, minus, perspiciatis obcaecati laborum veritatis repellat vero doloribus doloremque a facilis, ad repellendus saepe odio iusto.</p>
+            </div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+{% endblock main_content %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %} <title>Подробиці {{flight}}</title> {% endblock title %}
+
+{% block main_content %}
+<div class="container">
+    <div class="row">
+        <div class="card bg-secondary text-light mb-5 w-100">
+            <div class="card-header text-center display-4">Рейс {{flight}}</div>
+            <div class="card-body">
+                <div class="container">
+                    <div class="row">
+                        <p class="col-6"><b>Країна відправлення:</b> <i class="{{ flight.departure_airport.country.flag_css }}"></i> {{flight.departure_airport.country.name}}({{flight.departure_airport.country}})</p>
+                        <p class="col-6"><b>Місто відправлення:</b> {{flight.departure_airport.city}}</p>
+                    </div>
+                    <div class="row">
+                        <p class="col-6"><b>Країна прибуття:</b> <i class="{{ flight.arrival_airport.country.flag_css }}"></i> {{flight.arrival_airport.country.name}}({{flight.arrival_airport.country}})</p>
+                        <p class="col-6"><b>Місто прибуття(код):</b> {{flight.arrival_airport.city}}</p>
+                    </div>
+                    <div class="row">
+                        <p class="col-6"><b>Кількість вільних місць:</b> {{flight.free_seats_ammount}}</p>
+                    </div>
+                    <div class="row">
+                        <p class="col-6"><b>Дата відправлення:</b> {% if flight.departure_date < time_now %}{{flight.departure_date}} <b class="text-danger">Рейс вже почався!</b>{% else %}{{flight.departure_date}}{% endif %}</p>
+                        <p class="col-6"><b>Дата прибуття:</b> {{flight.arrival_date}}</p>
+                    </div>
+                    
+                    <div class="row">
+                        {% if user.is_authenticated %}
+                            <div class="text-center">
+                                {% if flight.departure_date < time_now %}
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="Рейс вже в дорозі, купити квиток неможливо">
+                                    <button class="btn btn-primary" type="button" disabled>Купити квиток</button>
+                                </span>
+                                {% else %}
+                                    <button class="btn btn-primary" type="button"
+                                        hx-get="{% url "buy_ticket_form" flight.pk %}"
+                                        hx-trigger="click"
+                                        hx-target="#ticket-buy">Забронювати квиток</button>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <p class="text-center">Для бронювання квитків, треба <a href="{% url "login" %}">увійти</a> в систему</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="ticket-buy">
+
+    </div>
+</div>
+<script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+</script>
+<script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+{% endblock main_content %}

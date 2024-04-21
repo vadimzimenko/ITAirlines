@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %} <title>Payment confirmation</title> {% endblock title %}
+
+{% block main_content %}
+    <div>
+        <h1 class="text-center">Ви згодні оплатити квиток?</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{form.as_p}}
+            <div class="text-center">
+                <button type="submit" class="btn btn-success">Так</button>
+                <a class="btn btn-danger" href="{% url "personal_page" %}">Ні</a>
+            </div>
+        </form>
+    </div>
+{% endblock main_content %}

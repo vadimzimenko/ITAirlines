@@ -1,0 +1,8 @@
+{% load crispy_forms_tags %}
+<form method="post" action="{% url "buy_ticket_form" flight_pk%}">
+    {% csrf_token %}
+    {{form|crispy}}
+    <div class="text-center">
+        <button type="submit" class="btn btn-success">Купити</button>
+    </div>
+</form>

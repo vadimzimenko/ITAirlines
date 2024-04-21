@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %} <title>Кабінет {{ user.username }}</title> {% endblock title %}
+
+
+{% block main_content %}
+    <div class="container w-100">
+        <div class="row">
+            <div class="col-4">
+                <div class="list-group" id="list-tab" role="tablist">
+                    <a class="list-group-item list-group-item-action active" 
+                       id="list-all-tickets" 
+                       data-bs-toggle="list" 
+                       href="#all_tickets-list" 
+                       role="tab"><i class="bi bi-ticket"></i> Всі квитки</a>
+                    <a class="list-group-item list-group-item-action" 
+                       id="list-tickets-list" 
+                       data-bs-toggle="list" 
+                       href="#tickets-list" 
+                       role="tab"><i class="bi bi-ticket-detailed-fill"></i> Дійсні квитки</a>
+                    <a class="list-group-item list-group-item-action" 
+                       id="list-personal_data-list" 
+                       data-bs-toggle="list" 
+                       href="#personal_data-list" 
+                       role="tab"><i class="bi bi-file-earmark-person-fill"></i> Персональні дані</a>
+                </div>
+            </div>
+            <div class="col-8">
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-pane fade show active"
+                    id="all_tickets-list"
+                    role="tabpanel">
+                        {% if user.get_all_bookings %}
+                            {% for booking in user.get_all_bookings %}
+                                <div class="card bg-secondary text-light mb-5" style="width: 36rem;">
+                                    <div class="card-header text-center display-5">{{booking.flight}}
+                                        {% if booking.flight.arrival_date < time_now %}
+                                            (Рейс скінчився)
+                                        {% elif booking.flight.departure_date < time_now %}
+                                            (Рейс в дорозі)
+                                        {% endif %}
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">Звідки: <i class="{{ booking.flight.departure_airport.country.flag_css }}"></i> {{booking.flight.departure_airport.country.name}}, {{booking.flight.departure_airport.city}}</p>
+                                        <p class="card-text">Куди: <i class="{{ booking.flight.arrival_airport.country.flag_css }}"></i> {{booking.flight.arrival_airport.country.name}}, {{booking.flight.arrival_airport.city}}</p>
+                                        <p class="card-text">Місце: {{booking.ticket.seat_num}}</p>
+                                        <p class="card-text">Дата відправлення: {{booking.flight.departure_date}}</p>
+                                        <p class="card-text">Дата прибуття: {{booking.flight.arrival_date}}</p>
+                                        <p class="card-text">Вартість квитка: {{booking.flight.ticket_price}}₴</p>
+                                        {% if booking.status == "PEND" %}
+                                            <div class="card-text text-center">
+                                                <a class="btn btn-info" href="{% url "payment_confirm" booking.pk %}">Оплатити квиток</a>
+                                                <a class="btn btn-danger" href="{% url "cancel_booking" booking.pk %}">Скасувати бронювання</a>
+                                            </div>
+                                        {% endif %}
+                                        {% if booking.status == "CONF" %}
+                                            <p class="card-text text-center text-success bg-white">Квиток сплачений!</p>
+                                            <div class="card-text text-center">
+                                                <a href="{% url "payment_detail" booking.payment.pk %}">Квитанція №{{booking.payment}}</a>
+                                            </div>
+                                        {% endif %}
+                                        {% if booking.status == "CANC" %}
+                                            <p class="card-text text-center text-danger bg-white">Ви скасували бронювання</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <h3>Ви ще не купили ні одного квитка.</h3>
+                        {% endif %}
+                    </div>
+                    <div class="tab-pane fade" 
+                    id="tickets-list" 
+                    role="tabpanel">
+                        {% if user.get_all_available_bookings %}
+                            {% for booking in user.get_all_available_bookings %}
+                                <div class="card bg-secondary text-light mb-5" style="width: 36rem;">
+                                    <div class="card-header text-center display-5">{{booking.flight}}</div>
+                                    <div class="card-body">
+                                        <p class="card-text">Звідки: <i class="{{ booking.flight.departure_airport.country.flag_css }}"></i> {{booking.flight.departure_airport.country.name}}, {{booking.flight.departure_airport.city}}</p>
+                                        <p class="card-text">Куди: <i class="{{ booking.flight.arrival_airport.country.flag_css }}"></i> {{booking.flight.arrival_airport.country.name}}, {{booking.flight.arrival_airport.city}}</p>
+                                        <p class="card-text">Місце: {{booking.ticket.seat_num}}</p>
+                                        <p class="card-text">Дата відправлення: {{booking.flight.departure_date}}</p>
+                                        <p class="card-text">Дата прибуття: {{booking.flight.arrival_date}}</p>
+                                        <p class="card-text">Вартість квитка: {{booking.flight.ticket_price}}₴</p>
+                                        {% if booking.status == "PEND" %}
+                                            <div class="card-text text-center">
+                                                <a class="btn btn-info" href="{% url "payment_confirm" booking.pk %}">Оплатити квиток</a>
+                                                <a class="btn btn-danger" href="{% url "cancel_booking" booking.pk %}">Скасувати бронювання</a>
+                                            </div>
+                                        {% endif %}
+                                        {% if booking.status == "CONF" %}
+                                            <p class="card-text text-center text-success bg-white">Квиток сплачений!</p>
+                                            <div class="card-text text-center">
+						                        <a href="{% url "payment_detail" booking.payment.pk %}">Квитанція №{{booking.payment}}</a>
+                                            </div>
+                                        {% endif %}
+                                        {% if booking.status == "CANC" %}
+                                            <p class="card-text text-center text-danger bg-white">Ви скасували бронювання</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <h3>У вас нема квитків на рейси, що ще не почалися.</h3>
+                        {% endif %}
+                    </div>
+                    <div class="tab-pane fade" 
+                    id="personal_data-list" 
+                    role="tabpanel">
+                        <div class="container">
+                            <div class="row">
+                                {% if user.first_name %}
+                                <div class="col-6">
+                                    Ім'я: {{ user.first_name}}
+                                </div>
+                                {% endif %}
+                                {% if user.last_name %}
+                                <div class="col-6">
+                                    Прізвище: {{user.last_name}}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    Нікнейм: {{user.username}}
+                                </div>
+                                <div class="col-6">
+                                    Електронна пошта: {{user.email}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock main_content %}

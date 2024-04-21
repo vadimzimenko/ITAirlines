@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %} <title>Sign Up</title> {% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block main_content %}
+<div class="row mt-5 mb-2">
+  <h2 class="text-center">Реєстрація</h2>
+</div>
+<div class="row">
+  <form method="post" class="col-auto container justify-content-center">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <div class="text-center">
+      <button class="btn btn-success" type="submit">Зареєструватись</button>
+    </div>
+  </form>
+</div>
+<div class="row text-center mt-2 text-secondary">
+  <p>Вже зареєстровані? <a href="{% url "login" %}">Увійти</a></p>
+</div>
+{% endblock main_content %}
